@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="5.0sp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/className"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="BSCS - 601"
+                android:textStyle="bold"
+                android:fontFamily="@font/roboto"
+                android:textColor="@color/black"
+                android:textSize="26sp"
+                android:layout_marginLeft="10dp"/>
+
+
+                <TextView
+                    android:id="@+id/yearLevel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="10dp"
+                    android:text="3rd Year"/>
+
+
+
+
+
+</LinearLayout>
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="67dp"
+            android:layout_marginEnd="2dp"
+            android:background="?android:attr/listDivider"/>
+
+    </RelativeLayout>
+
+        </LinearLayout>
+
+
+
+
