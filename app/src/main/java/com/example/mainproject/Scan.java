@@ -1,14 +1,15 @@
 package com.example.mainproject;
 
-import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -24,6 +25,7 @@ import java.util.Set;
 
 public class Scan extends AppCompatActivity {
 
+    private EditText answerKeyEditText; // EditText for user input
     private SurfaceView surfaceView;
     private TextView tv;
     private CameraSource cameraSource;
@@ -39,6 +41,7 @@ public class Scan extends AppCompatActivity {
 
         surfaceView = findViewById(R.id.surfaceView);
         tv = findViewById(R.id.script);
+        answerKeyEditText = findViewById(R.id.answerKeyEditText);
 
         startCameraSource();
     }
@@ -54,10 +57,11 @@ public class Scan extends AppCompatActivity {
 
             surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
                 @Override
-                public void surfaceCreated(SurfaceHolder surfaceHolder) {
+                public void surfaceCreated(@NonNull SurfaceHolder surfaceHolder) {
                     try {
-                        if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                            ActivityCompat.requestPermissions(Scan.this, new String[]{Manifest.permission.CAMERA}, Permission);
+                        // Check CAMERA permission before starting the camera
+                        if (ActivityCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                            ActivityCompat.requestPermissions(Scan.this, new String[]{android.Manifest.permission.CAMERA}, Permission);
                             return;
                         }
                         cameraSource.start(surfaceView.getHolder());
@@ -67,21 +71,18 @@ public class Scan extends AppCompatActivity {
                 }
 
                 @Override
-                public void surfaceChanged(SurfaceHolder surfaceHolder, int format, int width, int height) {
-
+                public void surfaceChanged(@NonNull SurfaceHolder surfaceHolder, int format, int width, int height) {
                 }
 
                 @Override
-                public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+                public void surfaceDestroyed(@NonNull SurfaceHolder surfaceHolder) {
                     cameraSource.stop();
                 }
             });
 
             textRecognizer.setProcessor(new Detector.Processor<TextBlock>() {
                 @Override
-                public void release() {
-
-                }
+                public void release() {}
 
                 @Override
                 public void receiveDetections(Detector.Detections<TextBlock> detections) {
@@ -96,24 +97,30 @@ public class Scan extends AppCompatActivity {
                                     stringBuilder.append(item.getValue());
                                     stringBuilder.append("\n");
                                 }
-                                String detectedText = stringBuilder.toString();
-                                boolean containsKeyword = false;
-                                for (String keyword : keywords) {
-                                    if (detectedText.contains(keyword)) {
-                                        containsKeyword = true;
-                                        break;
+                                String detectedText = stringBuilder.toString().trim(); // Trim the detected text
+
+                                // Get the user input from the EditText
+                                String userInput = answerKeyEditText.getText().toString().trim();
+
+                                // Check if the user input is not empty
+                                if (!userInput.isEmpty()) {
+                                    // Check if the detected text contains the user input (case-insensitive)
+                                    if (detectedText.toLowerCase().contains(userInput.toLowerCase())) {
+                                        tv.setText("Correct:\n" + detectedText);
+                                    } else {
+                                        tv.setText("Incorrect:\n" + detectedText);
                                     }
-                                }
-                                if (containsKeyword) {
-                                    tv.setText("Keywords matched:\n" + detectedText);
                                 } else {
-                                    tv.setText("No keywords matched:\n" + detectedText);
+                                    // Clear the text view if the user input is empty
+                                    tv.setText("");
                                 }
                             }
                         });
                     }
                 }
             });
+
+
         }
     }
 }
