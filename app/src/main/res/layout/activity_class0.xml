@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".Class0">
 
-
     <Button
         android:id="@+id/AddClass"
         android:layout_width="122dp"
@@ -17,32 +16,23 @@
         android:fontFamily="@font/roboto"
         android:padding="2dp"
         android:text="Add Student"
-
         android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.944"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <ScrollView
-        android:id="@+id/scrollView2"
+    <LinearLayout
+        android:id="@+id/container"
         android:layout_width="378dp"
         android:layout_height="491dp"
         android:layout_marginBottom="32dp"
         app:layout_constraintBottom_toTopOf="@+id/AddClass"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.515"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <LinearLayout
-            android:id="@+id/container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:clickable="true"
-            android:orientation="vertical" />
-
-    </ScrollView>
+        app:layout_constraintStart_toStartOf="parent"
+        android:orientation="vertical"
+        android:clickable="true" />
 
     <FrameLayout
         android:layout_width="420dp"
@@ -50,14 +40,14 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/bottomNavigationView" />
+        app:layout_constraintTop_toTopOf="@+id/bottomNavigationView"
+        tools:ignore="NotSibling">
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigationView"
-        android:layout_width="415dp"
-        android:layout_height="66dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/bottom_menu" />
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNavigationView"
+            android:layout_width="415dp"
+            android:layout_height="66dp"
+            app:menu="@menu/bottom_menu" />
+    </FrameLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

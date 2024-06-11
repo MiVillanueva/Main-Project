@@ -1,6 +1,6 @@
 package com.example.mainproject;
 
-import android.content.DialogInterface;
+
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -8,78 +8,140 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
+
 public class Class1 extends AppCompatActivity {
-    Button button;
-    LinearLayout Layout;
 
-    AlertDialog dialog;
-
+    private LinearLayout container;
+    private Button addClassButton;
+    private ArrayList<Student> students = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_class1);
+        setContentView(R.layout.activity_class0);
 
-        buildDialog();
-        Layout = findViewById(R.id.container);
+        container = findViewById(R.id.container);
+        addClassButton = findViewById(R.id.AddClass);
 
-
-        button = findViewById(R.id.AddClass);
-
-
-        button.setOnClickListener(new View.OnClickListener() {
+        addClassButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                dialog.show();
-
+                addStudent();
             }
         });
 
+        loadStudents();
     }
 
+    private void addStudent() {
+        final EditText studentName = new EditText(this);
+        studentName.setHint("Enter student name");
 
+        Button saveButton = new Button(this);
+        saveButton.setText("Save");
 
-    private void buildDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        View view = getLayoutInflater().inflate(R.layout.layout_student, null);
-        EditText name = view.findViewById(R.id.studentName);
+        final LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.HORIZONTAL);
+        layout.addView(studentName);
+        layout.addView(saveButton);
 
-        builder.setView(view)
-                .setTitle("Student Name")
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        container.addView(layout);
+
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String name = studentName.getText().toString();
+                if (!name.isEmpty()) {
+                    Student student = new Student(name);
+                    students.add(student);
+                    container.removeView(layout);
+                    displayStudent(student);
+                }
+            }
+        });
+    }
+
+    private void displayStudent(final Student student) {
+        final TextView studentTextView = new TextView(this);
+        studentTextView.setText(student.getName());
+
+        Button updateButton = new Button(this);
+        updateButton.setText("Update");
+
+        Button deleteButton = new Button(this);
+        deleteButton.setText("Delete");
+
+        final LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.HORIZONTAL);
+        layout.addView(studentTextView);
+        layout.addView(updateButton);
+        layout.addView(deleteButton);
+
+        container.addView(layout);
+
+        updateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final EditText editName = new EditText(Class1.this);
+                editName.setText(student.getName());
+
+                Button saveButton = new Button(Class1.this);
+                saveButton.setText("Save");
+
+                final LinearLayout editLayout = new LinearLayout(Class1.this);
+                editLayout.setOrientation(LinearLayout.HORIZONTAL);
+                editLayout.addView(editName);
+                editLayout.addView(saveButton);
+
+                container.removeView(layout);
+                container.addView(editLayout);
+
+                saveButton.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-
+                    public void onClick(View v) {
+                        String newName = editName.getText().toString();
+                        if (!newName.isEmpty()) {
+                            student.setName(newName);
+                            container.removeView(editLayout);
+                            displayStudent(student);
+                        }
                     }
-                })
-
-                .setPositiveButton("Add", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        addcard(name.getText().toString());
-
-
-                    }
-
                 });
+            }
+        });
 
-
-        dialog = builder.create();
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                students.remove(student);
+                container.removeView(layout);
+            }
+        });
     }
-    private void addcard(String btnClass) {
 
-        View view = getLayoutInflater().inflate(R.layout.list_student, null);
-        TextView nameView = view.findViewById(R.id.className);
+    private void loadStudents() {
+        // Load students from storage or database if needed
+        for (Student student : students) {
+            displayStudent(student);
+        }
+    }
 
-        nameView.setText(btnClass);
+    private static class Student {
+        private String name;
 
+        public Student(String name) {
+            this.name = name;
+        }
 
-        Layout.addView(view);
+        public String getName() {
+            return name;
+        }
 
+        public void setName(String name) {
+            this.name = name;
+        }
     }
 }

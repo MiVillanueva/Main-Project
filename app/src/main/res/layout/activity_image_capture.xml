@@ -23,7 +23,7 @@
         app:layout_constraintVertical_bias="0.95" />
 
     <View
-        android:id="@+id/white"
+        android:id="@+id/blueRectangle"
         android:layout_width="match_parent"
         android:layout_height="8dp"
         android:background="@color/white"
@@ -38,23 +38,32 @@
         android:scaleType="fitCenter"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/white"
+        app:layout_constraintTop_toBottomOf="@id/blueRectangle"
         app:layout_constraintBottom_toTopOf="@id/button"
         tools:layout_editor_absoluteX="34dp"
         tools:layout_editor_absoluteY="113dp"
         tools:ignore="MissingConstraints" />
 
+
+
+
     <ImageView
-        android:id="@+id/placeholder_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:src="@drawable/dota2"
-        app:layout_constraintBottom_toTopOf="@id/button"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:id="@+id/notificationBell"
+        android:layout_width="22dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="216dp"
+        android:layout_marginTop="20dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAllCaps="true"
+        android:textColor="@color/white"
+        tools:layout_editor_absoluteX="249dp"
+        tools:layout_editor_absoluteY="21dp"
+        tools:ignore="MissingConstraints" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

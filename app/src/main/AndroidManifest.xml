@@ -23,74 +23,65 @@
         <activity
             android:name=".MainActivity"
             android:exported="true">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-    <activity
-        android:name=".RegisterActivity"
-        android:exported="true"/>
 
-        <activity
-            android:name=".AboutPage"
-            android:exported="true"/>
-
-        <activity
-            android:name=".AnalysisActivity"
-            android:exported="true"/>
-
-        <activity
-            android:name=".AnswerKeyActivity"
-            android:exported="true"/>
-
-        <activity
-            android:name=".Class0"
-            android:exported="true"/>
-
-        <activity
-            android:name=".Class1"
-            android:exported="true"/>
-
-        <activity
-            android:name=".Class2"
-            android:exported="true"/>
-
-        <activity
-            android:name=".Class3"
-            android:exported="true"/>
-
-        <activity
-            android:name=".HomeActivity"
-            android:exported="true"/>
-
-        <activity
-            android:name=".ExamsActivity"
-            android:exported="true"/>
-
-        <activity
-            android:name=".Part2"
-            android:exported="true"/>
-
-        <activity
-            android:name=".pen"
-            android:exported="true"/>
-
-        <activity
-            android:name=".SettingsActivity"
-            android:exported="true"/>
-
-        <activity
-            android:name=".Scan"
+        <activity android:name=".Scan"
             android:exported="true"/>
 
         <activity android:name=".ImageCapture"
             android:exported="true"/>
 
-        <activity android:name=".Scan"
+        <activity android:name=".AboutPage"
             android:exported="true"/>
+
+        <activity android:name=".AnalysisActivity"
+            android:exported="true"/>
+
+        <activity android:name=".AnswerKeyActivity"
+            android:exported="true"/>
+
+        <activity android:name=".Class0"
+            android:exported="true"/>
+
+
+        <activity android:name=".Class1"
+            android:exported="true"/>
+
+        <activity android:name=".Class2"
+            android:exported="true"/>
+
+        <activity android:name=".CS_601"
+            android:exported="true"/>
+
+        <activity android:name=".CS_602"
+            android:exported="true"/>
+
+        <activity android:name=".ExamsActivity"
+            android:exported="true"/>
+
+        <activity android:name=".HomeActivity"
+            android:exported="true"/>
+
+
+
+        <activity android:name=".Part2"
+            android:exported="true"/>
+
+        <activity android:name=".pen"
+            android:exported="true"/>
+
+        <activity android:name=".RegisterActivity"
+            android:exported="true"/>
+
+        <activity android:name=".SettingsActivity"
+            android:exported="true"/>
+
+
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -101,7 +92,8 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+
+
     </application>
-
-
 </manifest>
