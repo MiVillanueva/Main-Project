@@ -1,12 +1,20 @@
 package com.example.mainproject;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,6 +23,7 @@ import androidx.core.app.ActivityCompat;
 
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
+import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 
@@ -25,14 +34,15 @@ import java.util.Set;
 
 public class Scan extends AppCompatActivity {
 
-    private EditText answerKeyEditText; // EditText for user input
+    private EditText answerKeyEditText;
     private SurfaceView surfaceView;
     private TextView tv;
     private CameraSource cameraSource;
+    private ImageView capturedImageView;
+    private Button captureButton;
     private static final int Permission = 100;
 
-    // List of keywords
-    private Set<String> keywords = new HashSet<>(Arrays.asList("Keyword1", "Keyword2", "Keyword3"));
+    private Bitmap capturedImageBitmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,8 +52,19 @@ public class Scan extends AppCompatActivity {
         surfaceView = findViewById(R.id.surfaceView);
         tv = findViewById(R.id.script);
         answerKeyEditText = findViewById(R.id.answerKeyEditText);
+        capturedImageView = findViewById(R.id.capturedImageView);
+        captureButton = findViewById(R.id.captureButton);
+
+        tv.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
 
         startCameraSource();
+
+        captureButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                captureImageAndProcessText();
+            }
+        });
     }
 
     private void startCameraSource() {
@@ -59,7 +80,6 @@ public class Scan extends AppCompatActivity {
                 @Override
                 public void surfaceCreated(@NonNull SurfaceHolder surfaceHolder) {
                     try {
-                        // Check CAMERA permission before starting the camera
                         if (ActivityCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                             ActivityCompat.requestPermissions(Scan.this, new String[]{android.Manifest.permission.CAMERA}, Permission);
                             return;
@@ -71,8 +91,7 @@ public class Scan extends AppCompatActivity {
                 }
 
                 @Override
-                public void surfaceChanged(@NonNull SurfaceHolder surfaceHolder, int format, int width, int height) {
-                }
+                public void surfaceChanged(@NonNull SurfaceHolder surfaceHolder, int format, int width, int height) {}
 
                 @Override
                 public void surfaceDestroyed(@NonNull SurfaceHolder surfaceHolder) {
@@ -86,41 +105,99 @@ public class Scan extends AppCompatActivity {
 
                 @Override
                 public void receiveDetections(Detector.Detections<TextBlock> detections) {
-                    final SparseArray<TextBlock> items = detections.getDetectedItems();
-                    if (items.size() != 0) {
-                        tv.post(new Runnable() {
+                    // No action needed for real-time text detection here
+                }
+            });
+        }
+    }
+
+    private void captureImageAndProcessText() {
+        cameraSource.takePicture(null, new CameraSource.PictureCallback() {
+            @Override
+            public void onPictureTaken(byte[] bytes) {
+                capturedImageBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                capturedImageBitmap = rotateImageIfNeeded(capturedImageBitmap);
+                capturedImageView.setImageBitmap(capturedImageBitmap);
+                processCapturedImage();
+            }
+        });
+    }
+
+    private Bitmap rotateImageIfNeeded(Bitmap bitmap) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(90);
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+    }
+
+    private void processCapturedImage() {
+        if (capturedImageBitmap != null) {
+            TextRecognizer textRecognizer = new TextRecognizer.Builder(getApplicationContext()).build();
+            if (!textRecognizer.isOperational()) {
+                Log.w("Tag", "Text recognizer dependencies are not yet available.");
+            } else {
+                Frame frame = new Frame.Builder().setBitmap(capturedImageBitmap).build();
+                SparseArray<TextBlock> items = textRecognizer.detect(frame);
+
+                StringBuilder stringBuilder = new StringBuilder();
+                for (int i = 0; i < items.size(); i++) {
+                    TextBlock item = items.valueAt(i);
+                    stringBuilder.append(item.getValue());
+                    stringBuilder.append("\n");
+                }
+
+                String detectedText = stringBuilder.toString().trim();
+
+                if (!detectedText.isEmpty()) {
+                    final String userInput = answerKeyEditText.getText().toString().trim();
+                    if (!userInput.isEmpty()) {
+                        final Set<String> userKeywords = new HashSet<>(Arrays.asList(userInput.split("\\s*,\\s*")));
+
+                        String highlightedText = detectedText;
+                        for (String keyword : userKeywords) {
+                            highlightedText = highlightedText.replaceAll("(?i)" + keyword, "<font color='green'>" + keyword + "</font>");
+                        }
+
+                        final String finalHighlightedText = highlightedText;
+                        runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                StringBuilder stringBuilder = new StringBuilder();
-                                for (int i = 0; i < items.size(); i++) {
-                                    TextBlock item = items.valueAt(i);
-                                    stringBuilder.append(item.getValue());
-                                    stringBuilder.append("\n");
-                                }
-                                String detectedText = stringBuilder.toString().trim(); // Trim the detected text
+                                tv.setText(Html.fromHtml(finalHighlightedText + "\n"));
+                            }
+                        });
 
-                                // Get the user input from the EditText
-                                String userInput = answerKeyEditText.getText().toString().trim();
+                        boolean matchFound = false;
+                        for (String keyword : userKeywords) {
+                            if (detectedText.toLowerCase().contains(keyword.toLowerCase())) {
+                                matchFound = true;
+                                break;
+                            }
+                        }
 
-                                // Check if the user input is not empty
-                                if (!userInput.isEmpty()) {
-                                    // Check if the detected text contains the user input (case-insensitive)
-                                    if (detectedText.toLowerCase().contains(userInput.toLowerCase())) {
-                                        tv.setText("Correct:\n" + detectedText);
-                                    } else {
-                                        tv.setText("Incorrect:\n" + detectedText);
-                                    }
-                                } else {
-                                    // Clear the text view if the user input is empty
-                                    tv.setText("");
+                        if (matchFound) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    tv.append(Html.fromHtml("\n<font color='green'> \n(Match found for keywords).</font>"));
                                 }
+                            });
+                        } else {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    tv.append(Html.fromHtml("\n<font color='red'> \n(No match found for keywords).</font>"));
+                                }
+                            });
+                        }
+                    } else {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                tv.setText(detectedText);
                             }
                         });
                     }
                 }
-            });
-
-
+            }
         }
     }
 }
